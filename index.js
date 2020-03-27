@@ -68,7 +68,27 @@ app.get('/', function(req, res) {
 // Students route
 app.get('/students', function(req, res) {
   // TODO: Retrieve data from database and send data with template
-  res.render('students', { title: 'Students' });
+  mongoClient.connect(databaseURL, options, function(err, client) {
+    if(err) throw err;
+    // Connect to the same database
+    const dbo = client.db(dbname);
+
+    // More stuff to go here ...
+    dbo.collection('students').find({}).toArray((err, result) => {
+      if (err) throw err;
+
+      //console.log(result);
+      console.log('Read successful!');
+      client.close;
+
+      res.render ('students', { //students is the hbs view
+          title: 'Students',
+          students: result //this is like the json file before
+      });
+    });
+  });
+
+  //res.render('students', { title: 'Students' }); this is the render before the tutorial
 })
 
 
@@ -85,23 +105,60 @@ app.post('/addStudent', function(req, res) {
 
   // TODO: Insert data to the database
   //       & send a custom message to send the "AJAX-way"
+  mongoClient.connect(databaseURL, options, (err, client) => {
+    if (err) throw err;
+    //Connect to the same database
+    const dbo = client.db(dbname);
 
+    // More stuff to go here ...
+
+    dbo.collection("students").insertOne(student, function(err, res) {
+      if (err) throw err;
+  
+      console.log(res);
+      console.log("Insert Successful!");
+  
+      client.close();
+    });
+  });
+  //New code to be added that has the success and messsage
+  const result = {success: true, message: "Student created!"};
+  res.send(result);
 });
 
 // Finds the students matching the name query from the database and returns the array
 app.post('/searchStudents', function(req, res) {
   var query = {
-    name: { $regex: '^' + req.body.name }
+    name: { $regex: '^' + req.body.name } //the data sent from ajax has a name 
     // name: { $regex: `^${req.body.name}` }
   };
 
   // TODO: Search for the student from the database
   //       & return the array of objects for the template
+
+  mongoClient.connect(databaseURL, options, (err, client) => {
+    if (err) throw err;
+
+    //connect to the same database
+    const dbo = client.db(dbname);
+
+    // More stuff to go here...
+    dbo.collection("students").find(query).toArray(function(err, result) {
+      if(err) throw err;
+  
+      console.log(result);
+      console.log("Read Successful!");
+      client.close();
+  
+      // send result here
+        res.send(result);
+    });
+  });
 });
 
-app.post('/updateStudent', function(req, res) {
+app.post('/updateStudent', function(req, res) { 
   var query = {
-    name: req.body.name
+    name: req.body.name //this is gotten from the postMan, in the mp, this is already set
   };
 
   var update = {

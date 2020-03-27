@@ -42,18 +42,18 @@ $(document).ready(function() {
       gender: gender
     };
 
-    $.post('addStudent', newStudent, function(data, status) {
+    $.post('addStudent', newStudent, function(data, status) { 
       console.log(data);
 
       if (data.success) {
-        $('#msg').text(data.message);
+        $('#msg').text(data.message); //gotten from the /addStudent of index.js
         $('#msg').addClass('success');
 
         $('#name').val('');
         $('#idnum').val('');
         $("input[name='gender']:checked").prop("checked", false);
       } else {
-        $('#msg').text(data.message);
+        $('#msg').text(data.message);//gotten from the /addStudent of index.js
         $('#msg').addClass('fail');
       }
 
@@ -65,7 +65,7 @@ $(document).ready(function() {
     // Get the data from the form
     var name = $('#searchName').val();
 
-    $.post('searchStudents', { name: name }, function(data, status) {
+    $.post('searchStudents', { name: name }, function(data, status) { //the data we got is from the index.js res.send(result in searchStudents)
       console.log(data);
 
       var studentListContainer = $('#studentList');
